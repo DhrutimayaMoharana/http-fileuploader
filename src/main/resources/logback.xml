@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	 <property name="LOGS" value="/opt/logs/http_file_uploading_logs" /> 
+	<!-- <property name="LOGS" value="/home/rst/Desktop/LOgs/core_utility_logs" /> -->
+
+	<appender name="Console"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%yellow(%d{yyyy-MM-dd HH:mm:ss}) %blue([%thread]) %highlight(%-5level) %cyan(%logger{36})-%msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="RollingFile"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- <file>${LOGS}/core_utility_logs_%d{yyyy-MM-dd}.log</file> -->
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d %p [%t] %m%n</Pattern>
+		</encoder>
+
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily and when the file reaches 10 MegaBytes -->
+			<fileNamePattern>${LOGS}/http_file_uploading_logs_%d{yyyy_MM_dd}.log
+			</fileNamePattern>
+			<!-- <timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy> -->
+		</rollingPolicy>
+	</appender>
+
+
+	<!-- LOG everything at INFO level -->
+	<root level="info">
+		<appender-ref ref="Console" />
+	</root>
+
+<!-- LOG "com.watsoo.core.config.LoggingFilter" at INFO level -->
+	<logger name="com.https.fileuploader.config.LoggingFilter" level="info"
+		additivity="false">
+		<appender-ref ref="RollingFile" />
+	</logger>
+
+	<!-- LOG "com.watsoo.core.*" at TRACE level -->
+	<logger name="com.https.fileuploader" level="trace" additivity="false">
+		<appender-ref ref="RollingFile" />
+	</logger>
+	<!-- <logger name="org.hibernate.SQL" level="trace"
+		additivity="false">
+		<appender-ref ref="RollingFile" />
+	</logger> -->
+	<logger name="org.springframework.web" level="trace"
+		additivity="false">
+		<appender-ref ref="RollingFile" />
+	</logger>
+
+</configuration>
