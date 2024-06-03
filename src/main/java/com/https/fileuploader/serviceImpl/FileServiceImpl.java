@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,19 +18,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.https.fileuploader.dto.ApiResponse;
-import com.https.fileuploader.service.FileUploadService;
+import com.https.fileuploader.service.FileService;
 import com.https.fileuploader.service.RequestResponseService;
 import com.https.fileuploader.util.ConvertionUtility;
+import com.https.fileuploader.util.FileUtility;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 @Service
-public class FileUploadServiceImpl implements FileUploadService {
+public class FileServiceImpl implements FileService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClassName.class);
 
@@ -40,7 +43,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	@Autowired
 	private RequestResponseService requestResponseService;
 
-	public FileUploadServiceImpl(@Value("${file.upload.dir}") String directory,
+	public FileServiceImpl(@Value("${file.upload.dir}") String directory,
 			@Value("${file.upload.secretKey}") String secretKey) {
 		this.DIRECTORY = directory;
 		this.secretKey = secretKey;
@@ -83,9 +86,9 @@ public class FileUploadServiceImpl implements FileUploadService {
 		Path path = Paths.get(DIRECTORY, filename);
 
 		// Check if file with the same name exists
-		if (Files.exists(path)) {
-			return new ApiResponse(409, "File with the same name already exists");
-		}
+//		if (Files.exists(path)) {
+//			return new ApiResponse(409, "File with the same name already exists");
+//		}
 
 		try {
 			// Save the file
@@ -95,7 +98,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 			return new ApiResponse(500, "Failed to save file");
 		}
 
-		return new ApiResponse(HttpStatus.OK.value(), "", "");
+		return new ApiResponse(HttpStatus.OK.value());
 	}
 
 	@Override
@@ -141,6 +144,39 @@ public class FileUploadServiceImpl implements FileUploadService {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	@Override
+	public ApiResponse getRequestData(String filename) {
+		LOGGER.info("Inside Store File !!!!!");
+
+		// Ensure the directory exists
+		File dir = new File(DIRECTORY);
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+
+		// Generate file path
+		Path path = Paths.get(DIRECTORY, filename != null && !filename.isEmpty() ? filename : new Date().toString());
+
+		System.out.println(path.toUri().getPath());
+
+		if (FileUtility.checkFileExistance(path.toUri().getPath())) {
+			try {
+				// Convert the file to ByteArrayResource
+				ByteArrayResource byteArrayResource = new ByteArrayResource(Files.readAllBytes(path));
+
+				if (byteArrayResource != null) {
+					// Use the ByteArrayResource as needed
+					return new ApiResponse(HttpStatus.OK.value(), HttpStatus.OK.name(), byteArrayResource);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			return new ApiResponse(HttpStatus.BAD_REQUEST.value(), "Someting went wrong, Try after some time!!");
+		}
+		return null;
 	}
 
 }

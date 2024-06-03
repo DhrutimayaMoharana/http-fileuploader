@@ -14,6 +14,7 @@ import javax.ws.rs.client.InvocationCallback;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
@@ -24,10 +25,6 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 
-/**
- * This class provides utility function for sending HTTP POST, PATCH, DELETE
- * request to a different endpoint
- */
 @Component
 public class HttpUtility {
 
@@ -36,16 +33,15 @@ public class HttpUtility {
 	private String traccarUserName;
 
 	private String traccarUserPassword;
-//	
-//	@Autowired
-//	private ExecutorService executorService;
 
 	public HttpUtility() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public HttpUtility(String traccarBaseUrl, String traccarUserName, String traccarUserPassword) {
+	public HttpUtility(@Value("${traccar.base.url}") String traccarBaseUrl,
+			@Value("${traccar.user.name}") String traccarUserName,
+			@Value("${traccar.user.password}") String traccarUserPassword) {
 		super();
 		this.traccarBaseUrl = traccarBaseUrl;
 		this.traccarUserName = traccarUserName;
