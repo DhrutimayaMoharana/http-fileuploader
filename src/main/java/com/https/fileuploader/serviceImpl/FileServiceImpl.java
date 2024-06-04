@@ -53,7 +53,7 @@ public class FileServiceImpl implements FileService {
 	public ApiResponse uploadFile(MultipartFile file, String filename, String timestamp, String sign,
 			HttpServletResponse response) {
 
-		response.setCharacterEncoding("UTF-8");
+//		response.setCharacterEncoding("UTF-8");
 
 		// Validate the sign
 		if (!isValidSign(filename, timestamp, sign)) {
@@ -98,7 +98,7 @@ public class FileServiceImpl implements FileService {
 			return new ApiResponse(500, "Failed to save file");
 		}
 
-		return new ApiResponse(HttpStatus.OK.value());
+		return new ApiResponse(HttpStatus.OK.value(), filename, " the high success ");
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class FileServiceImpl implements FileService {
 				requestBody.put("message", "Multipart request data saved successfully");
 			}
 
-			return new ApiResponse(200, "File uploaded successfully", file != null ? file.getOriginalFilename() : null);
+			return new ApiResponse(200, file != null ? file.getOriginalFilename() : null, "File uploaded successfully");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -159,8 +159,6 @@ public class FileServiceImpl implements FileService {
 		// Generate file path
 		Path path = Paths.get(DIRECTORY, filename != null && !filename.isEmpty() ? filename : new Date().toString());
 
-		System.out.println(path.toUri().getPath());
-
 		if (FileUtility.checkFileExistance(path.toUri().getPath())) {
 			try {
 				// Convert the file to ByteArrayResource
@@ -168,7 +166,7 @@ public class FileServiceImpl implements FileService {
 
 				if (byteArrayResource != null) {
 					// Use the ByteArrayResource as needed
-					return new ApiResponse(HttpStatus.OK.value(), HttpStatus.OK.name(), byteArrayResource);
+					return new ApiResponse(HttpStatus.OK.value(), byteArrayResource, HttpStatus.OK.name());
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -177,6 +175,28 @@ public class FileServiceImpl implements FileService {
 			return new ApiResponse(HttpStatus.BAD_REQUEST.value(), "Someting went wrong, Try after some time!!");
 		}
 		return null;
+	}
+
+	@Override
+	public ApiResponse chekFileExistOrNot(String filename) {
+		LOGGER.info("Inside Check File !!!!!");
+
+		// Ensure the directory exists
+		File dir = new File(DIRECTORY);
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+
+		// Generate file path
+		Path path = Paths.get(DIRECTORY, filename != null && !filename.isEmpty() ? filename : new Date().toString());
+
+		if (FileUtility.checkFileExistance(path.toUri().getPath())) {
+
+			return new ApiResponse(HttpStatus.OK.value(), "File is Exist!!!");
+
+		} else {
+			return new ApiResponse(HttpStatus.BAD_REQUEST.value(), "Someting went wrong, Try after some time!!");
+		}
 	}
 
 }

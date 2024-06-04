@@ -7,30 +7,30 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class ApiResponse {
 
 	private int code;
-	private String message;
 	private Object data;
+	private String message;
 
 	public ApiResponse() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public ApiResponse(int code, String message, Object data) {
+	public ApiResponse(int code, Object data, String message) {
 		super();
 		this.code = code;
-		this.message = message;
 		this.data = data;
-	}
-
-	public ApiResponse(int code) {
-		super();
-		this.code = code;
+		this.message = message;
 	}
 
 	public ApiResponse(int code, String message) {
 		super();
 		this.code = code;
 		this.message = message;
+	}
+
+	public ApiResponse(int code) {
+		super();
+		this.code = code;
 	}
 
 	public int getCode() {
@@ -41,20 +41,20 @@ public class ApiResponse {
 		this.code = code;
 	}
 
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
 	public Object getData() {
 		return data;
 	}
 
 	public void setData(Object data) {
 		this.data = data;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 }

@@ -102,7 +102,7 @@ public class RequestResponseServiceImpl implements RequestResponseService {
 
 			if (byteArrayResource != null) {
 				// Use the ByteArrayResource as needed
-				return new ApiResponse(HttpStatus.OK.value(), HttpStatus.OK.name(), byteArrayResource);
+				return new ApiResponse(HttpStatus.OK.value(), byteArrayResource, HttpStatus.OK.name());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

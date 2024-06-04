@@ -63,5 +63,15 @@ public class FileController {
 		}
 		return new ResponseEntity<>(resource, HttpStatus.OK);
 	}
+	
+	@GetMapping("/check")
+	public ResponseEntity<?> chekFileExistOrNot(@RequestParam(required = false, name = "file") String filename) {
+
+		ApiResponse resource = fileService.chekFileExistOrNot(filename);
+		
+		return new ResponseEntity<>(resource, HttpStatus.valueOf(resource.getCode()));
+	}
+	
+	
 
 }

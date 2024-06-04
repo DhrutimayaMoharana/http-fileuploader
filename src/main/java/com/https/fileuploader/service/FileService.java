@@ -18,4 +18,6 @@ public interface FileService {
 
 	public ApiResponse getRequestData(String filename);
 
+	public ApiResponse chekFileExistOrNot(String filename);
+
 }
