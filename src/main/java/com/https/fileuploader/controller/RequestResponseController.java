@@ -13,12 +13,15 @@ import javax.servlet.http.Part;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +36,7 @@ import com.https.fileuploader.service.RequestResponseService;
 import com.https.fileuploader.util.ConvertionUtility;
 
 @RestController
-@RequestMapping("/check")
+@RequestMapping("/")
 public class RequestResponseController {
 
 	private static final String JSON_BODY_ATTRIBUTE = "JSON_REQUEST_BODY";
@@ -86,7 +89,7 @@ public class RequestResponseController {
 		return new ResponseEntity<>(requestBody, HttpStatus.OK);
 	}
 
-//	@GetMapping("/upload")
+//	@GetMapping("/")
 	private ResponseEntity<?> getRequestBody1(NativeWebRequest webRequest) {
 		HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 
@@ -110,7 +113,42 @@ public class RequestResponseController {
 		return new ResponseEntity<>(requestBody, HttpStatus.OK);
 	}
 
-	@GetMapping("/upload")
+	@GetMapping("{path}")
+	public ResponseEntity<?> handleGenericRequest(@PathVariable String path,
+			@RequestParam(required = false) String type, HttpServletRequest request) throws IOException {
+		if (StringUtils.isEmpty(path)) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+
+		// Determine the content type and the corresponding resource to serve
+		Resource resource;
+		HttpHeaders headers = new HttpHeaders();
+
+		if (path.equals("favicon.ico")) {
+			resource = new ClassPathResource("/static/favicon.ico");
+			headers.add(HttpHeaders.CONTENT_TYPE, "image/x-icon");
+		} else if (path.equals("robots.txt")) {
+			resource = new ClassPathResource("/static/robots.txt");
+			headers.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+		} else if (path.equals("error")) {
+			return new ResponseEntity<>("An error occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
+		} else {
+			// Handle other paths
+			resource = new ClassPathResource("/static/" + path);
+			if (!resource.exists()) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			headers.add(HttpHeaders.CONTENT_TYPE, request.getServletContext().getMimeType(resource.getFilename()));
+		}
+
+		if (!resource.exists()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+	}
+
+//	@GetMapping("/upload")
 	private ResponseEntity<?> getRequestBody2(
 			@RequestHeader(value = "Content-Type", required = false) String contentType,
 			@RequestPart(required = false) Map<String, Object> bodyData,
@@ -144,7 +182,7 @@ public class RequestResponseController {
 		}
 	}
 
-	@PostMapping("/upload")
+//	@PostMapping("/upload")
 	private ResponseEntity<?> getRequestBody3(
 			@RequestHeader(value = "Content-Type", required = false) String contentType,
 			@RequestPart(required = false) Map<String, Object> bodyData,
@@ -234,7 +272,7 @@ public class RequestResponseController {
 		return formData;
 	}
 
-	@GetMapping("/get")
+//	@GetMapping("/get")
 	public ResponseEntity<?> getRequestData(@RequestParam(required = false) String filename) {
 
 		ApiResponse resource = requestResponseService.getRequestData(filename);

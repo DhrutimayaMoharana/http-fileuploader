@@ -2,9 +2,12 @@ package com.https.fileuploader.config;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
@@ -91,8 +94,8 @@ public class LoggingFilter extends OncePerRequestFilter {
 		}
 
 		LOGGER.info(
-				"FINISHED PROCESSING : METHOD={}; REQUESTURI={}; REQUEST PAYLOAD={}; RESPONSE CODE={}; RESPONSE={}; TIME TAKEN={}",
-				request.getMethod(), request.getRequestURI(), requestBody, response.getStatus(), responseBody,
+				"FINISHED PROCESSING : METHOD={}; REQUESTURI={}; REQUEST TYPE={}; REQUEST PAYLOAD={}; RESPONSE CODE={}; RESPONSE={}; TIME TAKEN={}",
+				request.getMethod(), request.getRequestURI(), request.getContentType() , requestBody, response.getStatus(), responseBody,
 				timeTaken);
 		responseWrapper.copyBodyToResponse();
 

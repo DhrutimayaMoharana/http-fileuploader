@@ -7,10 +7,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,6 +56,7 @@ public class FileServiceImpl implements FileService {
 			HttpServletResponse response) {
 
 //		response.setCharacterEncoding("UTF-8");
+		
 
 		// Validate the sign
 		if (!isValidSign(filename, timestamp, sign)) {
@@ -98,7 +101,7 @@ public class FileServiceImpl implements FileService {
 			return new ApiResponse(500, "Failed to save file");
 		}
 
-		return new ApiResponse(HttpStatus.OK.value(), filename, " the high success ");
+		return new ApiResponse(HttpStatus.OK.value(), filename, "File upload success");
 	}
 
 	@Override
